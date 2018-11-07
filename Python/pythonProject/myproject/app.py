@@ -46,6 +46,14 @@ def conv_temp(reading):
     temperatureC = (voltage - 0.5) * 100
     return temperatureC
 
+def conv_temp_arduino(temperatureC):
+    voltage += 0.5
+    voltage = temperatureC / 100
+    voltage *= 1024.0
+    reading = voltage /5.0
+    return reading
+
+
 def get_lightintensity_arduino(port):
     port.write(b'd')
     data = str(ser.readline())
@@ -55,11 +63,18 @@ def get_lightintensity_arduino(port):
     temp = temp['light_intensity']
     return temp
 
-def conv_light():
-    light_sen = get_lightintensity_arduino()
-    light = light_sen * 4.98
+def conv_light(reading):
+    light = reading * 4.98
     light /= 1023
     return light
+
+def con_light_arduino(light):
+    light *= 1024
+    reading = light / 4.98
+    return reading
+    
+
+
 
 app.layout = html.Div([
 
@@ -154,6 +169,7 @@ def update_temp(n):
 )
 def update_light(n):
     light = get_lightintensity_arduino(ser)
+    light = conv_light(light)
     return light
 
 
