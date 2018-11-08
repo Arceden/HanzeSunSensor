@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <avr/sfr_defs.h>
 
 #define F_CPU 16E6
@@ -81,33 +82,84 @@ void setup( void )
 }
 
 /************************************************************************/
-/* Input handler														*/
+/* This is the new input handler which can accept POST requests			*/
+/* Viewer discretion is advised.										*/
 /************************************************************************/
+char input_string[30];
+uint8_t input_string_index = 0;
 void input_handler()
 {
-
+	
 	//Return if there is nothing incoming on RX
 	if(!message_incomming()){
 		return 0;
 	}
 	
 	//Wait for input by the client
-	//TODO: Can input be used as a interrupt so that the while loop would continue until there's input?
 	char input = receive();
+	char compare_get[30];
+	char compare_post[4];
 	
-	//Expected input: D, d
-	//Action: Give the current data in JSON format
-	if(input==0x64||input==0x44){
-		get_JSON_data();
+	if(input ==	0x0D){
+		
+		//GET data
+		strcpy(compare_get, "d");
+		if(!strcmp(input_string, compare_get)){get_JSON_data();}
+			
+		//GET settings
+		strcpy(compare_get, "s");
+		if(!strcmp(input_string, compare_get)){get_JSON_settings();}
+
+		//POST temp_threshold HIGH
+		strcpy(compare_post, "tmph");
+		if(!strncmp(input_string, compare_post,4)){post_temperature(input_string, 1);}
+
+		//POST temp_threshold LOW
+		strcpy(compare_post, "tmpl");
+		if(!strncmp(input_string, compare_post,4)){post_temperature(input_string, 0);}
+		
+		//POST maximum extension
+		strcpy(compare_post, "exth");
+		if(!strncmp(input_string, compare_post,4)){post_extension(input_string, 1);}
+		
+		//POST minimum extension
+		strcpy(compare_post, "extl");
+		if(!strncmp(input_string, compare_post,4)){post_extension(input_string, 0);}
+		
+		//POST debugger toggle
+		strcpy(compare_post, "debg");
+		if(!strncmp(input_string, compare_post,4)){post_debugger();}
+		
+		//POST manual/automatic toggle
+		strcpy(compare_post, "manu");
+		if(!strncmp(input_string, compare_post,4)){post_manual();}
+		
+		//Reset the char array
+		input_string_index=0;		
+		memset(input_string, NULL, 30);
+		return 0;
 	}
 	
-	//Expected input: S, s
-	//Action: Give the current settings in a JSON format
-	else if(input==0x53||input==0x73){
-		get_JSON_settings();
-	}
+	input_string[input_string_index] = input;
+	input_string_index++;
 	
-	
+}
+
+void post_temperature( char str[30], uint8_t level ){
+	printf("Just imagine something happened to the temperature..\r\n");
+}
+
+void post_extension( char str[30], uint8_t level ){
+	printf("Just imagine something happened to the extensions..\r\n");
+}
+
+void post_debugger(){
+	debug=!debug;
+	printf("debugger:%d\r\n",debug);
+}
+
+void post_manual(){
+	printf("Just imagine it switched\r\n");
 }
 
 void main(void)
