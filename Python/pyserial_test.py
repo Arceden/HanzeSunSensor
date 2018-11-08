@@ -5,11 +5,14 @@ Gebruik dit python script om alle Arduino functies te testen vanuit Python
 import serial
 from time import sleep
 
+com = '/dev/tty.usbmodem1411'
+baud_rate = 19200
+
 try:
-    ser = serial.Serial('/dev/tty.usbmodem1411', 19200)
+    ser = serial.Serial(com, baud_rate)
 except serial.serialutil.SerialException:
     com = input("Enter com port (example: COM4): ")
-    ser = serial.Serial(com, 19200)
+    ser = serial.Serial(com, baud_rate)
 
 ser.flushInput()
 ser.flushOutput()
@@ -55,7 +58,7 @@ class Arduino():
         return self.ser.readline()
 
     def post_temph(self):
-        self.ser.write(b'tmpl 12344')
+        self.ser.write(b'tmpl 123$')
         self.wait_for_buffer()
         return self.ser.readline()
 
