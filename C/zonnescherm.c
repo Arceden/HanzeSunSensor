@@ -100,11 +100,15 @@ void input_handler()
 	char compare_get[30];
 	char compare_post[4];
 	
-	if(input ==	0x0D){
+	if(input ==	0x0D||input == 0x5C||input == 0x24){
 		
 		//GET data
 		strcpy(compare_get, "d");
 		if(!strcmp(input_string, compare_get)){get_JSON_data();}
+			
+		strcpy(compare_get, "data");
+		if(!strcmp(input_string, compare_get)){get_JSON_data();}
+	
 			
 		//GET settings
 		strcpy(compare_get, "s");
@@ -143,9 +147,6 @@ void input_handler()
 	
 	input_string[input_string_index] = input;
 	input_string_index++;
-	
-	//Wrong input
-	printf("null\r\n");
 	
 }
 
