@@ -57,8 +57,10 @@ layout = html.Div([
 
             html.P('Temperatuur', style={'font-size':'24px'}),
 
-            dcc.Graph(
-                id='temperatuur_grafiek'
+            html.Div(children=html.Div(id='temperatuur_grafiek_data')),
+            dcc.Interval(
+                id='temperatuur_grafiek_data_interval',
+                interval=1*1000
             )
 
         ],
@@ -69,8 +71,10 @@ layout = html.Div([
 
             html.P('Lichtintensiteit', style={'font-size':'24px'}),
 
-            dcc.Graph(
-                id='lichtintensiteit_grafiek'
+            html.Div(children=html.Div(id='lichtintensiteit_grafiek_data')),
+            dcc.Interval(
+                id='lichtintensiteit_grafiek_data_interval',
+                interval=1*1000
             )
 
         ],

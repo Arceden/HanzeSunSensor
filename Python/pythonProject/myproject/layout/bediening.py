@@ -43,7 +43,9 @@ layout = html.Div([
                         160: {'label': '160cm'}
                     },
                     allowCross=False,
-                )
+                ),
+
+                html.Span(id='output-range-slider', style={'padding-top':'50'})
             ],
             style={'width':'50%', 'margin':'0 auto', 'padding-top':'50px'}
             )

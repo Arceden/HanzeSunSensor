@@ -35,3 +35,12 @@ def show_time(n):
 )
 def show_date(n):
     return n
+
+# return output range slider
+@app.callback(
+    Output('output-range-slider', 'children'),
+    [Input('uitrol_bereik_handmatig', 'value')]
+)
+def update_output(value):
+    return "You have selected {}".format(value)
+    #returns a list

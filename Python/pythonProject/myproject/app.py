@@ -8,60 +8,41 @@ from .layout import data
 
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, Event
+import plotly.graph_objs as go
+from collections import deque
 
 import random
 import time
 import datetime
 import serial
 import json
-import sys
-
-com = '/dev/tty.usbmodem1411'
-try:
-    ser = serial.Serial(com, 19200)
-except serial.serialutil.SerialException:
-    com = input("Enter com port: ")
-    ser = serial.Serial(com, 19200)
-
-'''def port_is_usable():
-    try:
-        global ser
-        if not ser:
-            ser = serial.Serial('/dev/tty.usbmodem1411', 19200)
-            return True
-    except Exception:
-        return False
-
-port_is_usable()'''
 
 
 
+# initialising serial port
+ser = serial.Serial('/dev/tty.usbmodem1411', 19200)
+
+# returns the json value of the temperature
 def get_temperature_arduino(port):
-    port.write(b'd')
-    data = str(ser.readline())
+    port.write(b'd$')
+    data = str(port.readline())
     d = data[2:-5]
     json_acceptable_string = d.replace("'", "\"")
     temp = json.loads(json_acceptable_string)
     temp = temp['temperature']
     return temp
 
+# converts the temperature to degrees Celsius
 def conv_temp(reading):
     voltage = reading * 5.0
     voltage /= 1024.0
     temperatureC = (voltage - 0.5) * 100
     return temperatureC
 
-def conv_temp_arduino(temperatureC):
-    voltage += 0.5
-    voltage = temperatureC / 100
-    voltage *= 1024.0
-    reading = voltage /5.0
-    return reading
-
-
+# returns the json value of the light intensity
 def get_lightintensity_arduino(port):
-    port.write(b'd')
+    port.write(b'd$')
     data = str(ser.readline())
     d = data[2:-5]
     json_acceptable_string = d.replace("'", "\"")
@@ -69,19 +50,13 @@ def get_lightintensity_arduino(port):
     temp = temp['light_intensity']
     return temp
 
+# converts the light intensity to light value, this code is not correct and not used. It returns the ?Volt?
 def conv_light(reading):
     light = reading * 4.98
     light /= 1023
     return light
 
-def con_light_arduino(light):
-    light *= 1024
-    reading = light / 4.98
-    return reading
-    
-
-
-
+# the html code that is used by app
 app.layout = html.Div([
 
 
@@ -114,10 +89,10 @@ app.layout = html.Div([
                     value='bediening_tab',
                 ),
 
-                dcc.Tab(
-                    label='Instellingen',
-                    value='instellingen_tab',
-                )
+                #dcc.Tab(
+                #    label='Instellingen',
+                #    value='instellingen_tab',
+                #)
 
             ]
             , value='home_tab'
@@ -140,11 +115,12 @@ app.layout = html.Div([
     dcc.Interval(id='hidden_date_interval', interval=1*5000, n_intervals=0),
 
     html.Div(id='hidden_status', style={'display':'none'}),
-    dcc.Interval(id='hidden_status_interval', interval=1*5000, n_intervals=0)
+    dcc.Interval(id='hidden_status_interval', interval=1*5000, n_intervals=0),
 
 
 ], style={'width':'100%','background-color':'#e5e8e6','height':'100%','min-height':'1024px'})
 
+# renders the content of the Home, Data and Bediening tab. It is dynamically loaded.
 @app.callback(Output("tab_content", "children"), [Input("tabs", "value")])
 def render_content(tab):
     if tab == "home_tab":
@@ -156,7 +132,7 @@ def render_content(tab):
     else:
         return 'must still be done :D'
 
-# update temperature
+# updates the temperature every specified interval and returns it.
 @app.callback(
     Output('hidden_temp', 'children'),
     [Input('hidden_temp_interval', 'n_intervals')]
@@ -168,18 +144,18 @@ def update_temp(n):
 
 
 
-# update light
+# updates the light every specified interval and returns it.
 @app.callback(
     Output('hidden_light', 'children'),
     [Input('hidden_light_interval', 'n_intervals')]
 )
 def update_light(n):
     light = get_lightintensity_arduino(ser)
-    light = conv_light(light)
+    #light = conv_light(light)
     return light
 
 
-# update time
+# updates the time every specified interval and returns it.
 @app.callback(
     Output('hidden_time', 'children'),
     [Input('hidden_time_interval', 'n_intervals')]
@@ -188,7 +164,7 @@ def update_time(n):
     current = time.strftime('%H:%M:%S')
     return current
 
-# update date
+# update the data every specified interval and returns it.
 @app.callback(
     Output('hidden_date', 'children'),
     [Input('hidden_date_interval', 'n_intervals')]
@@ -197,7 +173,7 @@ def update_date(n):
     current_date = datetime.datetime.now().strftime('%d/%m/%y')
     return current_date
 
-# update status
+# update the status every specified interval and returns it. (should still improve the method because nothing changes, so it's useless)
 @app.callback(
     Output('hidden_status', 'children'),
     [Input('hidden_status_interval', 'n_intervals')]

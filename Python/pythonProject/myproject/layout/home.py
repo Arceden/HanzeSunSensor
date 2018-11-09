@@ -1,9 +1,11 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, Event
+import plotly.graph_objs as go
 
 import time
+from collections import deque
 
 
 
@@ -34,10 +36,10 @@ layout = html.Div([
 
             html.P('Temperatuur'),
 
-            dcc.Graph(
-
-                id='temperatuur_grafiek_home'
-
+            html.Div(children=html.Div(id='temperatuur_grafiek_home')),
+            dcc.Interval(
+                id='temperatuur_grafiek_home_interval',
+                interval=1*1000
             )
 
         ],
