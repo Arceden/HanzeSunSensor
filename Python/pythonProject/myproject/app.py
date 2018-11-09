@@ -15,8 +15,14 @@ import time
 import datetime
 import serial
 import json
+import sys
 
-ser = serial.Serial('/dev/tty.usbmodem1411', 19200)
+com = '/dev/tty.usbmodem1411'
+try:
+    ser = serial.Serial(com, 19200)
+except serial.serialutil.SerialException:
+    com = input("Enter com port: ")
+    ser = serial.Serial(com, 19200)
 
 '''def port_is_usable():
     try:
