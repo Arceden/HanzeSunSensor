@@ -8,3 +8,4 @@ TcfTransactionLog.csv
 #Python project bestanden
 */__pycache__/*
 *.pyc
+serial.conf
