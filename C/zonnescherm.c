@@ -149,11 +149,12 @@ void setup( void )
 /************************************************************************/
 char input_string[30];
 uint8_t input_string_index = 0;
+uint8_t incomming_message = 0;
 void input_handler()
 {
 	
 	//Return if there is nothing incoming on RX
-	if(!message_incomming()){
+	if(!message_incomming() && incomming_message==0){
 		return 0;
 	}
 	
@@ -201,6 +202,7 @@ void input_handler()
 		if(!strncmp(input_string, compare_post,4)){post_manual();}
 		
 		//Reset the char array
+		incomming_message=1;
 		input_string_index=0;		
 		memset(input_string, NULL, 30);
 		
@@ -235,7 +237,7 @@ void main(void)
 	light = 0;
 	rotation = 0;
 	temperature = 0;
-	debug = 0;	//If debugger is true (1), all the sensors will be updated when JSON formatted data is requested
+	debug = 1;	//If debugger is true (1), all the sensors will be updated when JSON formatted data is requested
 	
 	setup();
 	
