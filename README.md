@@ -12,6 +12,8 @@ pip install pandas
 pip install pyserial
 ```
 
+Gelieve seriële port in app.py specificeren, in callbacks_home,py en callbacks_data.py. Vervolgens de juiste poort invullen.
+
 In de terminal: python run.py om het bestand uit te voeren
 
 ## C
