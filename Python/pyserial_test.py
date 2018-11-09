@@ -57,8 +57,9 @@ class Arduino():
         self.wait_for_buffer()
         return self.ser.readline()
 
-    def post_temph(self):
-        self.ser.write(b'tmpl 123$')
+    def post_message(self, string):
+        string += "$"
+        self.ser.write(bytearray(string, "UTF-8"))
         self.wait_for_buffer()
         return self.ser.readline()
 
@@ -71,4 +72,8 @@ print("GET | DATA     | ", ar.get_data() )
 print("GET | SETTINGS | ", ar.get_settings() )
 print("POST| DEBUGGER | ", ar.toggle_debugger() )
 print("GET | SETTINGS | ", ar.get_settings() )
-print("POST| TEMP_H   | ", ar.post_temph() )
+print("POST| TEMP_H   | ", ar.post_message("tmph 120") )
+print("POST| TEMP_L   | ", ar.post_message("tmpl 110") )
+print("POST| EXT_H    | ", ar.post_message("exth 90") )
+print("POST| EXT_L    | ", ar.post_message("extl 12") )
+print("POST| MANU     | ", ar.post_message("manu") )
