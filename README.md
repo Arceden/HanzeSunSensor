@@ -36,6 +36,17 @@ Voorbeeld:
 
 Op het moment is er nog geen sprake van een goede handshake protocol. Dat zal later nog toegevoegd worden.
 
+GET commandos:
+  d
+  s
+POST commandos:
+  tmph <waarde>
+  tmpl <waarde>
+  exth <waarde>
+  extl <waarde>
+  manu
+  debg
+
 
 ## Arduino aansluiting
 De componenten die nodig zijn voor het systeem zijn als volgt;
