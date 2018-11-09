@@ -8,11 +8,20 @@ from time import sleep
 com = '/dev/tty.usbmodem1411'
 baud_rate = 19200
 
+#Get com port from the configuration file
+try:
+    f = open("serial.conf", "r")
+    com = f.read()
+except FileNotFoundError:
+    f = open("serial.conf", "w")
+
 try:
     ser = serial.Serial(com, baud_rate)
 except serial.serialutil.SerialException:
     com = input("Enter com port (example: COM4): ")
     ser = serial.Serial(com, baud_rate)
+    f.write(com)
+    f.close()
 
 ser.flushInput()
 ser.flushOutput()
