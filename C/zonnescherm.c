@@ -70,71 +70,17 @@ unsigned char get_JSON_data(void)
 	return 0;
 }
 
-//average
-//calculate the average from the array temps
-float average_temp()
-{
-	int i;
-	float avg, som = 0.0;
-	for (i = 0; i < max_index; i++)
-	{
-		som += temps[i];
-	}
-	avg = som / (max_index - 1);
-	return avg;
-}
-
-//calculate the average from the array lights
-float average_light()
-{
-	int i;
-	float avg, som = 0.0;
-	for (i = 0; i < max_index; i++)
-	{
-		som += lights[i];
-	}
-	avg = som / (max_index - 1);
-	return avg;
-}
-
-//Adds to array
-//Adds the value temperature to the array temps
-float temp_add_array(temperature)
-{
-	temps[temp_index] = temperature;
-	temp_index ++;	
-	
-	if (temps[(max_index - 1)] > 0)
-	{
-		temperature = average_temp(temps);
-	}
-}
-
-//Adds the value light to the array lights
-float light_add_array(light)
-{
-	lights[light_index] = light;
-	light_index ++;
-	
-	if (lights[(max_index - 1)] > 0)
-	{
-		light = average_light(lights);
-	}
-}
-
 
 
 //Updaters
 void update_temperature( void )
 {
 	temperature = adc_read(TEMP_PIN);
-	temperature = temp_add_array();
 }
 
 void update_light( void )
 {
 	light = adc_read(LIGHT_PIN);
-	light = light_add_array();
 }
 
 

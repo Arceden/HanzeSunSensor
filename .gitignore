@@ -9,3 +9,4 @@ TcfTransactionLog.csv
 */__pycache__/*
 *.pyc
 serial.conf
+arduino_error.log
