@@ -77,6 +77,9 @@ app.layout = html.Div([
 
     html.Div(id='tab_content'),
 
+    html.Div(id='hidden_data', style={'display':'none'}),
+    dcc.Interval(id='hidden_data_interval', interval=1*5000, n_intervals=0),
+
     html.Div(id='hidden_temp', style={'display':'none'}),
     dcc.Interval(id='hidden_temp_interval', interval=1*5000, n_intervals=0),
 
@@ -94,6 +97,12 @@ app.layout = html.Div([
 
 
 ], style={'width':'100%','background-color':'#e5e8e6','height':'100%','min-height':'1024px'})
+
+
+@app.callback(Output("hidden_data", "children"), [Input('hidden_temp_interval', 'n_intervals')])
+def update_data(n):
+    ar.get_data()
+    return n
 
 # renders the content of the Home, Data and Bediening tab. It is dynamically loaded.
 @app.callback(Output("tab_content", "children"), [Input("tabs", "value")])

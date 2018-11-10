@@ -8,6 +8,7 @@ class Arduino():
         self.com = com
         self.baud_rate = baud_rate
         self.connected = False
+        self.data = self.json_convert('{"type": "current_data", "rotation": 0, "temperature": 164, "light_intensity": 46}')
 
         #Make connection
         try:
@@ -28,6 +29,7 @@ class Arduino():
         while(self.ser.in_waiting == 0):
             self.write('d')
             sleep(.5)
+        self.connected = True
         self.ser.flushInput()
         self.ser.flushOutput()
 
@@ -85,21 +87,21 @@ class Arduino():
     def get_data(self):
         self.write("d")
         output = self.readline()
-        return self.json_convert(output)
+        output = self.json_convert(output)
+        self.data = output
+        return output
 
     '''
     Get temperature
     '''
     def get_temperature(self):
-        data = self.get_data()
-        return data['temperature']
+        return self.data['temperature']
 
     '''
     Get light intensity
     '''
     def get_light(self):
-        data = self.get_data()
-        return data['light_intensity']
+        return self.data['light_intensity']
 
 
     '''
