@@ -18,17 +18,27 @@
 #include "connection.h"
 #include "adc.h"
 
-
+// Data holders
 uint8_t debug;
+uint16_t light;
 uint16_t rotation;
 uint16_t temperature;
-uint16_t light;
 
+uint16_t tmph;
+uint16_t tmpl;
+uint16_t exth;
+uint16_t extl;
+uint16_t luxh;
+uint16_t luxl;
+uint8_t manual;
+
+//Arrays
 #define max_index 12
-uint8_t temp_index;
 uint16_t temps[max_index];
-uint8_t light_index;
 uint16_t lights[max_index];
+uint8_t temp_index;
+uint8_t light_index;
+
 
 /*
 	Print the system output like a JSON formatted array so that Python can easily use it.
@@ -37,7 +47,8 @@ uint16_t lights[max_index];
 */
 unsigned char get_JSON_settings(void)
 {
-	printf("{'type': 'settings', 'debug': %d, 'rotation': %d}\r\n", debug, rotation);
+	//printf("{'type': 'settings', 'manual': %d, 'debug': %d, 'rotation': %d, 'temperature_max_threshold': %d, 'temperature_min_threshold': %d, 'light_max_threshold': %d, 'light_min_threshold': %d, 'extension_max': %d, 'extension_min': %d}\r\n", manual, debug, rotation, tmph, tmpl, luxh, luxl, exth, extl);
+	printf("{'type': 'settings', 'manual': %d, 'debug': %d, 'rotation': %d, 'temperature':{'max': %d, 'min': %d}, 'light':{'max': %d, 'min': %d}, 'extension':{'max': %d, 'min': %d}}\r\n", manual, debug, rotation, tmph, tmpl, luxh, luxl, exth, extl);
 	return 0;
 }
 
@@ -141,6 +152,14 @@ void setup( void )
 	update_light();
 	update_temperature();
 	
+	tmph = 50;
+	tmpl = 0;
+	exth = 50;
+	extl = 0;
+	luxh = 50;
+	luxl = 0;
+	manual = 1;
+	
 }
 
 /************************************************************************/
@@ -192,6 +211,15 @@ void input_handler()
 		//POST minimum extension
 		strcpy(compare_post, "extl");
 		if(!strncmp(input_string, compare_post,4)){post_extension(input_string, 0);}
+			
+		//POST max lux
+		strcpy(compare_post, "luxh");
+		if(!strncmp(input_string, compare_post,4)){post_light(input_string, 1);}
+			
+		//POST min lux
+		strcpy(compare_post, "luxl");
+		if(!strncmp(input_string, compare_post,4)){post_light(input_string, 0);}
+		
 		
 		//POST debugger toggle
 		strcpy(compare_post, "debg");
@@ -214,21 +242,69 @@ void input_handler()
 	
 }
 
+int decode_values( char ar[30] )
+{
+	
+	char tmp[25];
+	uint8_t x=0;
+	int i;
+	
+	while(ar[x+5]!=NULL){
+		tmp[x]=ar[x+5];
+		x++;
+	}
+	sscanf(tmp, "%d", &i);
+	return i;
+	
+}
+
 void post_temperature( char str[30], uint8_t level ){
-	printf("Just imagine something happened to the temperature..\r\n");
+	
+	uint16_t v = decode_values(str);
+	if(level){
+		tmph=v;
+	}else{
+		tmpl=v;
+	}
+	
+	printf("{'type':'post_request', 'success': 1}");
+	
 }
 
 void post_extension( char str[30], uint8_t level ){
-	printf("Just imagine something happened to the extensions..\r\n");
+	
+	uint16_t v = decode_values(str);
+	if(level){
+		exth=v;
+	}else{
+		extl=v;
+	}
+	
+	printf("{'type':'post_request', 'success': 1}");
+		
+}
+
+void post_light( char str[30], uint8_t level ){
+	
+	uint16_t v = decode_values(str);
+	if(level){
+		luxh=v;
+	}else{
+		luxl=v;
+	}
+	
+	printf("{'type':'post_request', 'success': 1}");
+		
 }
 
 void post_debugger(){
 	debug=!debug;
-	printf("debugger:%d\r\n",debug);
+	printf("{'type':'post_request', 'success': 1}");
 }
 
 void post_manual(){
-	printf("Just imagine it switched\r\n");
+	manual=!manual;
+	printf("{'type':'post_request', 'success': 1}");
 }
 
 void main(void)
