@@ -34,20 +34,33 @@ uint8_t manual;
 
 //Arrays
 #define max_index 12
-uint16_t temps[max_index];
-uint16_t lights[max_index];
-uint8_t temp_index;
-uint8_t light_index;
+uint16_t temp_list[max_index];
+uint16_t light_list[max_index];
+uint8_t temp_index=0;
+uint8_t light_index=0;
 
+
+uint16_t get_average(uint16_t l[max_index])
+{
+	
+	int sum = 0;
+	uint8_t i;
+	
+	for(i=0;i<max_index;i++){
+		sum+=l[i];
+		if(l[i]==0){break;}
+	}
+	
+	return sum/i;
+	
+}
 
 /*
 	Print the system output like a JSON formatted array so that Python can easily use it.
 	The JSON_settings array contains the settings which the Python client can have control over.
-	TODO: Implement variables such as rotation_max, light_threshold, temperature_threshold
 */
 unsigned char get_JSON_settings(void)
 {
-	//printf("{'type': 'settings', 'manual': %d, 'debug': %d, 'rotation': %d, 'temperature_max_threshold': %d, 'temperature_min_threshold': %d, 'light_max_threshold': %d, 'light_min_threshold': %d, 'extension_max': %d, 'extension_min': %d}\r\n", manual, debug, rotation, tmph, tmpl, luxh, luxl, exth, extl);
 	printf("{'type': 'settings', 'manual': %d, 'debug': %d, 'rotation': %d, 'temperature':{'max': %d, 'min': %d}, 'light':{'max': %d, 'min': %d}, 'extension':{'max': %d, 'min': %d}}\r\n", manual, debug, rotation, tmph, tmpl, luxh, luxl, exth, extl);
 	return 0;
 }
@@ -55,7 +68,6 @@ unsigned char get_JSON_settings(void)
 /*
 	Print the system output like a JSON formatted array so that Python can easily use it.
 	The JSON_data array contains the data obtained by the sensors.
-	TODO: Also send older data and average numbers of the variables
 */
 unsigned char get_JSON_data(void)
 {
@@ -66,22 +78,31 @@ unsigned char get_JSON_data(void)
 		update_light();	
 	}
 	
-	printf("{'type': 'current_data', 'rotation': %d, 'temperature': %d, 'light_intensity': %d}\r\n", rotation, temperature, light);
+	uint16_t temperature_avg = get_average(temp_list);
+	uint16_t light_avg = get_average(light_list);
+	
+	printf("{'type': 'current_data', 'temperature': %d, 'light_intensity': %d}\r\n", temperature_avg, light_avg);
 	return 0;
 }
-
 
 
 //Updaters
 void update_temperature( void )
 {
 	temperature = adc_read(TEMP_PIN);
+	temp_list[temp_index]=temperature;
+	temp_index++;
+	if(temp_index==max_index)temp_index=0;
 }
 
 void update_light( void )
 {
 	light = adc_read(LIGHT_PIN);
+	light_list[light_index]=light;
+	light_index++;
+	if(light_index==max_index)light_index=0;
 }
+
 
 
 //Setup things
@@ -266,8 +287,10 @@ void main(void)
 	SCH_Add_Task(input_handler, 0, 1);
 	
 	if(!debug){
-		SCH_Add_Task(update_temperature, 0, 4000);
-		SCH_Add_Task(update_light, 0, 3000);
+		//SCH_Add_Task(update_temperature, 0, 4000);
+		//SCH_Add_Task(update_light, 0, 3000);
+		SCH_Add_Task(update_temperature, 0, 500);
+		SCH_Add_Task(update_light, 0, 500);
 		SCH_Add_Task(get_JSON_data, 0, 6000);
 	}	
 	
