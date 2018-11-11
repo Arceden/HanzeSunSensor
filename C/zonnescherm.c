@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <avr/sfr_defs.h>
+#include <avr/interrupt.h>
 
 #define F_CPU 16E6
 #define HIGH 0x1
@@ -333,7 +334,7 @@ void main(void)
 		//SCH_Add_Task(update_light, 0, 3000);
 		SCH_Add_Task(update_temperature, 0, 500);
 		SCH_Add_Task(update_light, 0, 500);
-		//SCH_Add_Task(update_rotation, 0, 100);
+		SCH_Add_Task(update_rotation, 0, 100);
 		SCH_Add_Task(get_JSON_data, 0, 6000);
 	}	
 	
@@ -350,7 +351,6 @@ void main(void)
 }
 
 //Interrupt for the ultrasonic sensor to get the pulse time in microseconds
-/*
 ISR (INT1_vect)
 {
 	if (gv_echo==1)					//when logic from HIGH to LOW
@@ -369,4 +369,3 @@ ISR (INT1_vect)
 		gv_echo=1;					//Set count to 1
 	}
 }
-*/
