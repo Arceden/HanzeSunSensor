@@ -12,6 +12,8 @@
 #include <avr/sfr_defs.h>
 
 #define F_CPU 16E6
+#define HIGH 0x1
+#define LOW 0x0
 #include <util/delay.h>
 
 #include "serial.h"
@@ -32,6 +34,9 @@ uint16_t luxh;
 uint16_t luxl;
 uint8_t manual;
 
+static volatile int gv_count;
+static volatile int gv_echo = 0;
+
 //Arrays
 #define max_index 12
 uint16_t temp_list[max_index];
@@ -39,6 +44,15 @@ uint16_t light_list[max_index];
 uint8_t temp_index=0;
 uint8_t light_index=0;
 
+
+void write(uint8_t pin, uint8_t val)
+{
+	if (val == LOW) {
+		PORTD &= ~(_BV(pin)); // clear bit
+	} else {
+		PORTD |= _BV(pin); // set bit
+	}
+}
 
 uint16_t get_average(uint16_t l[max_index])
 {
@@ -76,6 +90,7 @@ unsigned char get_JSON_data(void)
 	if(debug){
 		update_temperature();
 		update_light();	
+		update_rotation();
 	}
 	
 	uint16_t temperature_avg = get_average(temp_list);
@@ -103,6 +118,26 @@ void update_light( void )
 	if(light_index==max_index)light_index=0;
 }
 
+void update_rotation( void )
+{
+
+	//Restart HC-SR04 by setting TRIG pin back to LOW
+	_delay_ms(10);
+	write(PIND2, LOW);
+	_delay_us(1);
+	//Send a pulse
+	_delay_ms(10);
+	write(PIND2, HIGH); //Set PIN 0 HIGH
+	_delay_us(10);
+	write(PIND2, LOW); //Set PIN 0 LOW
+	
+	rotation = ((gv_count / 16) / 58.2);
+	
+	if (rotation < 1)
+	{
+		rotation = 0;
+	}
+}
 
 
 //Setup things
@@ -110,6 +145,13 @@ void setup( void )
 {
 	
 	DDRB = 0xFF;			//Set DDRB as output
+	
+	//Setup for ultrasonic sensor
+	DDRD = 0b00000100;		//Set triggerpin for the ultrasonic sensor as output
+	
+	EIMSK |= (1 << INT1);	// enable INT1
+	EICRA |= (1 << ISC10);	// set INT1 to trigger while rising edge = HIGH
+	//
 	
 	adc_init();				//Init Analog to Digital Converter
 	uart_init();			//Init Serial
@@ -291,6 +333,7 @@ void main(void)
 		//SCH_Add_Task(update_light, 0, 3000);
 		SCH_Add_Task(update_temperature, 0, 500);
 		SCH_Add_Task(update_light, 0, 500);
+		SCH_Add_Task(update_rotation, 0, 100);
 		SCH_Add_Task(get_JSON_data, 0, 6000);
 	}	
 	
@@ -304,4 +347,24 @@ void main(void)
 	
 	return 0;
 		
+}
+
+//Interrupt for the ultrasonic sensor to get the pulse time in microseconds
+ISR (INT1_vect)
+{
+	if (gv_echo==1)					//when logic from HIGH to LOW
+	{
+		TCCR1B = 0;					//disabling counter
+		gv_count = TCNT1;			//count memory is updated to integer
+		TCNT1= 0;					//resetting the counter memory
+		gv_echo = 0;				//Set count to 0
+		TCCR1B = (1 << CS12) | (1 << WGM12);
+	}
+
+	if (gv_echo==0)					//when logic change from LOW to HIGH
+	{
+		TCCR1B = 0;
+		TCCR1B |= _BV(CS10);		//enabling counter (TCNT1) without any prescaling
+		gv_echo=1;					//Set count to 1
+	}
 }
