@@ -1,10 +1,12 @@
-from .server import app, server, ar
+from .server import app, server, ar, autonoom
 from . import callbacks_home
 from . import callbacks_data
 from . import callbacks_bediening
+from . import callbacks_instellingen
 from .layout import home
 from .layout import bediening
 from .layout import data
+from .layout import instellingen
 
 import dash_html_components as html
 import dash_core_components as dcc
@@ -17,6 +19,7 @@ import time
 import datetime
 import json
 from pprint import pprint
+
 
 # converts the temperature to degrees Celsius
 def conv_temp(reading):
@@ -64,10 +67,10 @@ app.layout = html.Div([
                     value='bediening_tab',
                 ),
 
-                #dcc.Tab(
-                #    label='Instellingen',
-                #    value='instellingen_tab',
-                #)
+                dcc.Tab(
+                    label='Instellingen',
+                    value='instellingen_tab',
+                )
 
             ]
             , value='home_tab'
@@ -95,6 +98,8 @@ app.layout = html.Div([
     html.Div(id='hidden_status', style={'display':'none'}),
     dcc.Interval(id='hidden_status_interval', interval=1*5000, n_intervals=0),
 
+    html.Div(id='hidden_manual', style={'display':'none'})
+
 
 ], style={'width':'100%','background-color':'#e5e8e6','height':'100%','min-height':'1024px'})
 
@@ -114,7 +119,7 @@ def render_content(tab):
     elif tab == "bediening_tab":
         return bediening.layout
     else:
-        return 'must still be done :D'
+        return instellingen.layout
 
 # updates the temperature every specified interval and returns it.
 @app.callback(

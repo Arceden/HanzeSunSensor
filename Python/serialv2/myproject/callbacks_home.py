@@ -59,7 +59,7 @@ def update_values(times, temperature):
     temperature.append(temp)
     return times, temperature
 
-max_length = 10
+max_length = 12
 times = deque(maxlen=max_length)
 temperature = deque(maxlen=max_length)
 

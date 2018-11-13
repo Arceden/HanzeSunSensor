@@ -60,7 +60,7 @@ layout = html.Div([
             html.Div(children=html.Div(id='temperatuur_grafiek_data')),
             dcc.Interval(
                 id='temperatuur_grafiek_data_interval',
-                interval=1*1000
+                interval=1*5000
             )
 
         ],
@@ -74,7 +74,7 @@ layout = html.Div([
             html.Div(children=html.Div(id='lichtintensiteit_grafiek_data')),
             dcc.Interval(
                 id='lichtintensiteit_grafiek_data_interval',
-                interval=1*1000
+                interval=1*5000
             )
 
         ],
@@ -83,28 +83,28 @@ layout = html.Div([
     ]
     ),
     # row 3
-    html.Div([
-        html.Div([
+    #html.Div([
+    #    html.Div([
+    #
+    #        html.P('Gemiddelde temperatuur'),
+    #
+    #        generate_table(df)
 
-            html.P('Gemiddelde temperatuur'),
+    #    ],
+    #    style={'background-color':'#FFFFFF', 'height':'400px', 'width':'49.3%', 'float':'left', 'border':'0.1vw solid #C8D4E3', 'margin':'0.25%', 'text-align':'center'}
+    #    ),
 
-            generate_table(df)
+    #    html.Div([
 
-        ],
-        style={'background-color':'#FFFFFF', 'height':'400px', 'width':'49.3%', 'float':'left', 'border':'0.1vw solid #C8D4E3', 'margin':'0.25%', 'text-align':'center'}
-        ),
+    #        html.P('Gemiddelde lichtintensiteit'),
 
-        html.Div([
+    #        generate_table(df)
 
-            html.P('Gemiddelde lichtintensiteit'),
-
-            generate_table(df)
-
-        ],
-        style={'background-color':'#FFFFFF', 'height':'400px', 'width':'49.3%', 'float':'left', 'border':'0.1vw solid #C8D4E3', 'margin':'0.25%',  'text-align':'center'}
-        )
-    ]
-    )
+    #    ],
+    #    style={'background-color':'#FFFFFF', 'height':'400px', 'width':'49.3%', 'float':'left', 'border':'0.1vw solid #C8D4E3', 'margin':'0.25%',  'text-align':'center'}
+    #    )
+    #]
+    #)
 
 
 ])

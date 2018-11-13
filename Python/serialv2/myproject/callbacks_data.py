@@ -50,7 +50,7 @@ def update_values(times, temperature):
     temperature.append(temp)
     return times, temperature
 
-max_length = 10
+max_length = 12
 times = deque(maxlen=max_length)
 temperature = deque(maxlen=max_length)
 data_dict = {"Temperature":temperature}
@@ -91,7 +91,7 @@ def update_graph():
 # light intensity graphs
 
 
-light_max_length = 10
+light_max_length = 12
 times_l = deque(maxlen=light_max_length)
 light_intensity = deque(maxlen=light_max_length)
 def update_values_l(times_l, light_intensity):

@@ -39,7 +39,7 @@ layout = html.Div([
             html.Div(children=html.Div(id='temperatuur_grafiek_home')),
             dcc.Interval(
                 id='temperatuur_grafiek_home_interval',
-                interval=1*1000
+                interval=1*5000
             )
 
         ],

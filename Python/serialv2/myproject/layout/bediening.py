@@ -12,11 +12,14 @@ layout = html.Div([
 
             html.P('Handmatig', style={'font-size':'24px'}),
 
+
+
             html.Div([
                 # when button is pressed children changes to 'UIT', also need counter variable
                 html.Button(
-                    children='AAN',
-                    id='bediening_knop_1'
+                    children='switch',
+                    id='bediening_knop_1',
+                    n_clicks=0
                 )
 
             ]),
@@ -60,14 +63,17 @@ layout = html.Div([
 
             html.P('Autonoom', style={'font-size':'24px'}),
 
-            html.Div([
-                # when button is pressed change 'UIT' to 'AAN' and vice versa. Need counter variable
-                html.Button(
-                    children='UIT',
-                    id='bediening_knop_2'
-                )
 
-            ]),
+
+            #html.Div([
+                # when button is pressed change 'UIT' to 'AAN' and vice versa. Need counter variable
+            #    html.Button(
+            #        children='switch',
+            #        id='bediening_knop_2',
+            #        n_clicks=0
+            #    )
+
+            #]),
 
             html.Div([
 
