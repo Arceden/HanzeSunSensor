@@ -277,8 +277,6 @@ void post_temperature( char str[30], uint8_t level ){
 		tmpl=v;
 	}
 	
-	printf("{'type':'post_request', 'success': 1}");
-	
 }
 
 void post_extension( char str[30], uint8_t level ){
@@ -289,8 +287,6 @@ void post_extension( char str[30], uint8_t level ){
 	}else{
 		extl=v;
 	}
-	
-	printf("{'type':'post_request', 'success': 1}");
 		
 }
 
@@ -302,19 +298,15 @@ void post_light( char str[30], uint8_t level ){
 	}else{
 		luxl=v;
 	}
-	
-	printf("{'type':'post_request', 'success': 1}");
 		
 }
 
 void post_debugger(){
 	debug=!debug;
-	printf("{'type':'post_request', 'success': 1}");
 }
 
 void post_manual(){
 	manual=!manual;
-	printf("{'type':'post_request', 'success': 1}");
 }
 
 void main(void)
