@@ -1,4 +1,4 @@
-from .server import app, server, ar, autonoom
+from .server import app, server, ar
 from . import callbacks_home
 from . import callbacks_data
 from . import callbacks_bediening

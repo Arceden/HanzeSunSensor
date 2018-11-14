@@ -237,7 +237,7 @@ void input_handler()
 		
 		//POST manual/automatic toggle
 		strcpy(compare_post, "manu");
-		if(!strncmp(input_string, compare_post,4)){post_manual();}
+		if(!strncmp(input_string, compare_post,4)){post_manual(input_string);}
 		
 		//Reset the char array
 		incomming_message=1;
@@ -305,8 +305,15 @@ void post_debugger(){
 	debug=!debug;
 }
 
-void post_manual(){
-	manual=!manual;
+void post_manual(char str[30]){
+	uint8_t v=decode_values(str);
+	if(v==1){
+		manual=v;
+		PORTB=0x02;
+	} else if (v==0) {
+		manual=v;
+		PORTB=0x01;
+	}
 }
 
 void main(void)
