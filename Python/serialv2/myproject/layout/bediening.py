@@ -8,56 +8,7 @@ import time
 layout = html.Div([
 
     html.Div([
-        html.Div([
 
-            html.P('Handmatig', style={'font-size':'24px'}),
-
-
-
-            html.Div([
-                # when button is pressed children changes to 'UIT', also need counter variable
-                html.Button(
-                    children='switch',
-                    id='bediening_knop_1',
-                    n_clicks=0
-                )
-
-            ]),
-
-            html.Div([
-
-                html.P(children='Geef het gewenste uitrol bereik aan:'),
-
-                dcc.RangeSlider(
-
-                    id='uitrol_bereik_handmatig',
-                    min=0,
-                    max=160,
-                    value=[10, 160],
-                    marks={
-                        0: {'label': '0cm'},
-                        20: {'label': '20cm'},
-                        40: {'label': '40cm'},
-                        60: {'label': '60cm'},
-                        80: {'label': '80cm'},
-                        100: {'label': '100cm'},
-                        120: {'label': '120cm'},
-                        140: {'label': '140cm'},
-                        160: {'label': '160cm'}
-                    },
-                    allowCross=False,
-                ),
-
-                html.Span(id='output-range-slider', style={'padding-top':'50'})
-            ],
-            style={'width':'50%', 'margin':'0 auto', 'padding-top':'50px'}
-            )
-
-        ],
-        style={'background-color': '#FFFFFF',
-            'border':'0.1vw solid #C8D4E3','height': '500px','width':'49.3%',
-            'margin':'0.25%','text-align':'center', 'float':'left', 'padding-top':'10px'}
-        ),
 
         html.Div([
 
@@ -78,13 +29,13 @@ layout = html.Div([
             html.Div([
 
                 html.P(children='Geef het gewenste temperatuur bereik aan:'),
+                html.P('', id='temperatuur_bereik_autonoom_P'),
 
                 dcc.RangeSlider(
 
                     id='temperatuur_bereik_autonoom',
                     min=-30,
                     max=40,
-                    value=[10, 35],
                     marks={
                         -30: {'label': '-30°C', 'style': {'color': '#9EE4D9'}},
                         -20: {'label': '-20°C'},
@@ -104,13 +55,13 @@ layout = html.Div([
             html.Div([
 
                 html.P(children='Geef het gewenste uitrol bereik aan:'),
+                html.P('', id='uitrol_bereik_autonoom_P'),
 
                 dcc.RangeSlider(
 
                     id='uitrol_bereik_autonoom',
                     min=0,
                     max=160,
-                    value=[10, 160],
                     marks={
                         0: {'label': '0cm'},
                         20: {'label': '20cm'},
@@ -129,7 +80,7 @@ layout = html.Div([
             )
         ],
         style={'background-color': '#FFFFFF',
-            'border':'0.1vw solid #C8D4E3', 'height': '500px','width':'49.3%',
+            'border':'0.1vw solid #C8D4E3', 'height': '500px','width':'100%',
             'margin': '0.25%', 'text-align':'center', 'float':'left', 'padding-top':'10px'}
         )
     ],

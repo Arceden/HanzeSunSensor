@@ -8,10 +8,10 @@ class Arduino():
         self.com = com
         self.baud_rate = baud_rate
         self.connected = False
-        self.data = {}
-        self.settings = {}
+        self.data = self.json_convert('{"type": "current_data", "rotation": 0, "temperature": 164, "light_intensity": 46}')
+        self.settings = self.json_convert('{"type": "settings", "manual": 1, "debug": 1, "rotation": 0, "temperature":{"max": 50, "min": 0}, "light":{"max": 50, "min": 0}, "extension":{"max": 50, "min": 0}}')
         self.manual = False
-
+        
 
         #Make connection
         try:
@@ -114,19 +114,10 @@ class Arduino():
         return self.data['light_intensity']
 
     def get_state(self):
-        if self.settings['manual']==1:
-            return True
-        return False
+        return self.manual
 
-    def set_state(self, state):
-        if state:
-            self.settings['manual']=1
-            self.write('manu 1')
-        else :
-            self.settings['manual']=0
-            self.write('manu 0')
-        self.readline()
-        self.get_settings()
+    def set_state(self, bool):
+        self.manual = bool
 
 
     '''
