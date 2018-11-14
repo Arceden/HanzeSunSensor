@@ -299,17 +299,7 @@ void setup( void )
 {
 	
 	DDRB = 0xFF;			//Set DDRB as output
-	
-	//Setup for ultrasonic sensor
 	DDRD = 0b01000100;		//Set triggerpin for the ultrasonic sensor as output
-	
-	// Phase Correct PWM 8 Bit, Clear OCA0 on Compare Match
-	// Set on TOP
-	//TCCR0A = (1 << WGM00) | (1 << COM0A1);
-	// prescale = 64, fPWM = fCPU /(N*510)= 16E6/(64*510) = 490 Hz
-	//TCCR0B = (1 << CS01) | (1 << CS00);
-	// init PWM value
-	//OCR0A = 0;
 	
 	EIMSK |= (1 << INT1);	// enable INT1
 	EICRA |= (1 << ISC10);	// set INT1 to trigger while rising edge = HIGH
@@ -321,8 +311,7 @@ void setup( void )
 	
 	tmph = 27;
 	tmpl = 0;
-	//exth = 160;
-	exth = 80;
+	exth = 160;
 	extl = 5;
 	luxh = 100;
 	luxl = 0;
@@ -369,8 +358,11 @@ void zonnescherm (void){
 	int a = get_percentage(rotation, 30);
 	int b = get_percentage(position, 160);
 	if(a<b+5 && a>b-5){
-		PORTB=1;
-		//OCR0A=position;
+		if(position==exth){
+			PORTB=1;
+		} else {
+			PORTB=4;
+		}
 	} else {
 		PORTB=2;
 	}
