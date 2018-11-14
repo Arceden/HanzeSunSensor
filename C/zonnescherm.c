@@ -35,6 +35,13 @@ uint16_t luxh;
 uint16_t luxl;
 uint8_t manual;
 
+uint16_t temperature_avg = 170;
+uint16_t light_avg = 50;
+
+//ZONNESCHERM POSITIE
+uint8_t position;
+uint8_t pwm;
+
 static volatile int gv_count;
 static volatile int gv_echo = 0;
 
@@ -99,10 +106,10 @@ unsigned char get_JSON_data(void)
 		update_rotation();
 	}
 	
-	uint16_t temperature_avg = get_average(temp_list);
-	uint16_t light_avg = get_average(light_list);
+	temperature_avg = get_average(temp_list);
+	light_avg = get_average(light_list);
 	
-	printf("{'type': 'current_data', 'rotation': %d, 'temperature': %d, 'light_intensity': %d}\r\n", rotation, temperature_avg, light_avg);
+	printf("{'type': 'current_data', 'screen': %d, 'rotation': %d, 'temperature': %d, 'light_intensity': %d}\r\n", position, rotation, temperature_avg, light_avg, position);
 	return 0;
 }
 
@@ -294,7 +301,15 @@ void setup( void )
 	DDRB = 0xFF;			//Set DDRB as output
 	
 	//Setup for ultrasonic sensor
-	DDRD = 0b00000100;		//Set triggerpin for the ultrasonic sensor as output
+	DDRD = 0b01000100;		//Set triggerpin for the ultrasonic sensor as output
+	
+	// Phase Correct PWM 8 Bit, Clear OCA0 on Compare Match
+	// Set on TOP
+	//TCCR0A = (1 << WGM00) | (1 << COM0A1);
+	// prescale = 64, fPWM = fCPU /(N*510)= 16E6/(64*510) = 490 Hz
+	//TCCR0B = (1 << CS01) | (1 << CS00);
+	// init PWM value
+	//OCR0A = 0;
 	
 	EIMSK |= (1 << INT1);	// enable INT1
 	EICRA |= (1 << ISC10);	// set INT1 to trigger while rising edge = HIGH
@@ -304,16 +319,18 @@ void setup( void )
 	SCH_Init_T1();			//Init Scheduler
 	stdout = &mystdout;		//Init printf()
 	
-	update_light();
-	update_temperature();
-	
-	tmph = 50;
+	tmph = 27;
 	tmpl = 0;
-	exth = 160;
-	extl = 80;
-	luxh = 50;
+	//exth = 160;
+	exth = 80;
+	extl = 5;
+	luxh = 100;
 	luxl = 0;
-	manual = 1;
+	manual = 0;
+	position = 0;
+	
+	update_temperature();
+	update_light();
 	
 }
 
@@ -321,11 +338,39 @@ int get_percentage(uint8_t v, uint8_t max){
 	return ((double)v/(double)max)*100;
 }
 
-void test (void){
+/************************************************************************/
+/* Set the state of the sunscreen
+/* 0 = False, Open the screen                                           */
+/* 1 = True, Lower the screen
+/************************************************************************/
+void state(uint8_t bool){
+	if(bool==0){
+		position=extl;
+	} else {
+		position=exth;
+	}
+}
+
+void zonnescherm (void){
+	
+	//If it's night
+	if(light<=luxh){
+		state(0);
+	} else {
+		
+		if(temperature_avg<tmph){
+			state(0);
+		} else {
+			state(1);	
+		}
+		
+	}
+	
 	int a = get_percentage(rotation, 30);
-	int b = get_percentage(extl, 160);
+	int b = get_percentage(position, 160);
 	if(a<b+5 && a>b-5){
 		PORTB=1;
+		//OCR0A=position;
 	} else {
 		PORTB=2;
 	}
@@ -343,7 +388,7 @@ void main(void)
 	setup();
 	
 	SCH_Add_Task(input_handler, 0, 1);
-	SCH_Add_Task(test, 0, 50);
+	SCH_Add_Task(zonnescherm, 0, 50);
 	
 	if(!debug){
 		//SCH_Add_Task(update_temperature, 0, 4000);
