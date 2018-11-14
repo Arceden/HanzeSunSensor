@@ -38,6 +38,11 @@ uint8_t manual;
 static volatile int gv_count;
 static volatile int gv_echo = 0;
 
+//Input handler 
+volatile char input_string[30];
+volatile uint8_t input_string_index = 0;
+volatile uint8_t incomming_message = 0;
+
 //Arrays
 #define max_index 12
 uint16_t temp_list[max_index];
@@ -140,45 +145,10 @@ void update_rotation( void )
 	}
 }
 
-
-//Setup things
-void setup( void )
-{
-	
-	DDRB = 0xFF;			//Set DDRB as output
-	
-	//Setup for ultrasonic sensor
-	DDRD = 0b00000100;		//Set triggerpin for the ultrasonic sensor as output
-	
-	EIMSK |= (1 << INT1);	// enable INT1
-	EICRA |= (1 << ISC10);	// set INT1 to trigger while rising edge = HIGH
-	//
-	
-	adc_init();				//Init Analog to Digital Converter
-	uart_init();			//Init Serial
-	SCH_Init_T1();			//Init Scheduler
-	stdout = &mystdout;		//Init printf()
-	
-	update_light();
-	update_temperature();
-	
-	tmph = 50;
-	tmpl = 0;
-	exth = 50;
-	extl = 0;
-	luxh = 50;
-	luxl = 0;
-	manual = 1;
-	
-}
-
 /************************************************************************/
 /* This is the new input handler which can accept POST requests			*/
 /* Viewer discretion is advised.										*/
 /************************************************************************/
-char input_string[30];
-uint8_t input_string_index = 0;
-uint8_t incomming_message = 0;
 void input_handler()
 {
 	
@@ -193,14 +163,14 @@ void input_handler()
 	char compare_post[4];
 	
 	if(input ==	0x0D||input == 0x5C||input == 0x24){
-		
+
 		//GET data
 		strcpy(compare_get, "d");
 		if(!strcmp(input_string, compare_get)){get_JSON_data();}
-			
+		
 		strcpy(compare_get, "data");
 		if(!strcmp(input_string, compare_get)){get_JSON_data();}
-	
+		
 			
 		//GET settings
 		strcpy(compare_get, "s");
@@ -221,7 +191,7 @@ void input_handler()
 		//POST minimum extension
 		strcpy(compare_post, "extl");
 		if(!strncmp(input_string, compare_post,4)){post_extension(input_string, 0);}
-			
+		
 		//POST max lux
 		strcpy(compare_post, "luxh");
 		if(!strncmp(input_string, compare_post,4)){post_light(input_string, 1);}
@@ -230,7 +200,6 @@ void input_handler()
 		strcpy(compare_post, "luxl");
 		if(!strncmp(input_string, compare_post,4)){post_light(input_string, 0);}
 		
-		
 		//POST debugger toggle
 		strcpy(compare_post, "debg");
 		if(!strncmp(input_string, compare_post,4)){post_debugger();}
@@ -238,13 +207,13 @@ void input_handler()
 		//POST manual/automatic toggle
 		strcpy(compare_post, "manu");
 		if(!strncmp(input_string, compare_post,4)){post_manual(input_string);}
-		
+
 		//Reset the char array
-		incomming_message=1;
+		incomming_message=0;
 		input_string_index=0;		
 		memset(input_string, NULL, 30);
-		
-		return 0;
+
+		return;
 	}
 	
 	input_string[input_string_index] = input;
@@ -316,17 +285,65 @@ void post_manual(char str[30]){
 	}
 }
 
+/************************************************************************/
+/* Setup                                                                */
+/************************************************************************/
+void setup( void )
+{
+	
+	DDRB = 0xFF;			//Set DDRB as output
+	
+	//Setup for ultrasonic sensor
+	DDRD = 0b00000100;		//Set triggerpin for the ultrasonic sensor as output
+	
+	EIMSK |= (1 << INT1);	// enable INT1
+	EICRA |= (1 << ISC10);	// set INT1 to trigger while rising edge = HIGH
+	
+	adc_init();				//Init Analog to Digital Converter
+	uart_init();			//Init Serial
+	SCH_Init_T1();			//Init Scheduler
+	stdout = &mystdout;		//Init printf()
+	
+	update_light();
+	update_temperature();
+	
+	tmph = 50;
+	tmpl = 0;
+	exth = 160;
+	extl = 80;
+	luxh = 50;
+	luxl = 0;
+	manual = 1;
+	
+}
+
+int get_percentage(uint8_t v, uint8_t max){
+	return ((double)v/(double)max)*100;
+}
+
+void test (void){
+	int a = get_percentage(rotation, 30);
+	int b = get_percentage(extl, 160);
+	if(a<b+5 && a>b-5){
+		PORTB=1;
+	} else {
+		PORTB=2;
+	}
+	return 0;
+}
+
 void main(void)
 {
 	
 	light = 0;
 	rotation = 0;
 	temperature = 0;
-	debug = 0	//If debugger is true (1), all the sensors will be updated when JSON formatted data is requested
+	debug = 0;	//If debugger is true (1), all the sensors will be updated when JSON formatted data is requested
 	
 	setup();
 	
 	SCH_Add_Task(input_handler, 0, 1);
+	SCH_Add_Task(test, 0, 50);
 	
 	if(!debug){
 		//SCH_Add_Task(update_temperature, 0, 4000);
