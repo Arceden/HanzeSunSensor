@@ -76,7 +76,7 @@ uint16_t get_average(uint16_t l[max_index])
 */
 unsigned char get_JSON_settings(void)
 {
-	printf("{'type': 'settings', 'manual': %d, 'debug': %d, 'rotation': %d, 'temperature':{'max': %d, 'min': %d}, 'light':{'max': %d, 'min': %d}, 'extension':{'max': %d, 'min': %d}}\r\n", manual, debug, rotation, tmph, tmpl, luxh, luxl, exth, extl);
+	printf("{'type': 'settings', 'manual': %d, 'debug': %d, 'temperature':{'max': %d, 'min': %d}, 'light':{'max': %d, 'min': %d}, 'extension':{'max': %d, 'min': %d}}\r\n", manual, debug, tmph, tmpl, luxh, luxl, exth, extl);
 	return 0;
 }
 
@@ -97,7 +97,7 @@ unsigned char get_JSON_data(void)
 	uint16_t temperature_avg = get_average(temp_list);
 	uint16_t light_avg = get_average(light_list);
 	
-	printf("{'type': 'current_data', 'temperature': %d, 'light_intensity': %d}\r\n", temperature_avg, light_avg);
+	printf("{'type': 'current_data', 'rotation': %d, 'temperature': %d, 'light_intensity': %d}\r\n", rotation, temperature_avg, light_avg);
 	return 0;
 }
 
@@ -322,7 +322,7 @@ void main(void)
 	light = 0;
 	rotation = 0;
 	temperature = 0;
-	debug = 1;	//If debugger is true (1), all the sensors will be updated when JSON formatted data is requested
+	debug = 0	//If debugger is true (1), all the sensors will be updated when JSON formatted data is requested
 	
 	setup();
 	
@@ -334,7 +334,6 @@ void main(void)
 		SCH_Add_Task(update_temperature, 0, 500);
 		SCH_Add_Task(update_light, 0, 500);
 		SCH_Add_Task(update_rotation, 0, 100);
-		SCH_Add_Task(get_JSON_data, 0, 6000);
 	}	
 	
 	SCH_Start();
