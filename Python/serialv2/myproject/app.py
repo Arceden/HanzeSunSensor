@@ -67,10 +67,10 @@ app.layout = html.Div([
                     value='bediening_tab',
                 ),
 
-                dcc.Tab(
-                    label='Instellingen',
-                    value='instellingen_tab',
-                )
+                #dcc.Tab(
+                #    label='Instellingen',
+                #    value='instellingen_tab',
+                #)
 
             ]
             , value='home_tab'
@@ -118,8 +118,8 @@ def render_content(tab):
         return data.layout
     elif tab == "bediening_tab":
         return bediening.layout
-    else:
-        return instellingen.layout
+    #else:
+    #    return instellingen.layout
 
 # updates the temperature every specified interval and returns it.
 @app.callback(

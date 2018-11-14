@@ -26,7 +26,9 @@ layout = html.Div([
     html.Div([
         html.Div([
 
-            html.P('Uitleg')
+            html.P('Uitleg'),
+
+            html.Span('Dit dashboard geeft u een overzicht van de data die binnenkomt via het apparaat. Daarnaast is het ook mogelijk om uw apparaat in te stellen. Kijk gerust op de verschillende tabs.')
 
         ],
         style={'background-color':'#FFFFFF', 'height':'600px', 'width':'49.3%', 'float':'left', 'border':'0.1vw solid #C8D4E3', 'margin':'0.25%', 'text-align':'center'}

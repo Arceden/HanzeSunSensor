@@ -94,7 +94,7 @@ def update_graph():
         figure={'data': [data],'layout' : go.Layout(xaxis=dict(range=[min(times),max(times)]),
                                                     yaxis=dict(range=[min(data_dict['Temperature']),max(data_dict['Temperature'])]),
                                                     margin={'l':50,'r':1,'t':45,'b':1},
-                                                    title='{}'.format('Temperature'))}
+                                                    title='{}'.format(''))}
         ), className=class_choice))
 
     return graphs

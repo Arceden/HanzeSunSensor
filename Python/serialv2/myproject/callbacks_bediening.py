@@ -49,20 +49,7 @@ def show_time(n):
 def show_date(n):
     return n
 
-# return output range slider
-#if ar.get_state() == True:
-#@app.callback(
-#    Output('output-range-slider', 'children'),
-#    [Input('uitrol_bereik_handmatig', 'value')]
-#)
-#def get_output(value):
-#    value_min = value[0]
-#    value_max = value[1]
-#    ar.write('exth {}'.format(value_min))
-#    ar.readline()
-#    ar.write('extl {}'.format(value_max))
-#    return "Min: {}, Max: {}".format(value_min, value_max)
-    #returns a list
+
 
 @app.callback(
     Output('temperatuur_bereik_autonoom_P', 'children'),

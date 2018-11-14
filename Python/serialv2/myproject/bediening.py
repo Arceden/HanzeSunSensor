@@ -6,9 +6,7 @@ import dash_html_components as html
 
 
 
-
 import time
-
 
 layout = html.Div([
 
@@ -18,18 +16,6 @@ layout = html.Div([
         html.Div([
 
             html.P('Autonoom', style={'font-size':'24px'}),
-
-
-
-            #html.Div([
-                # when button is pressed change 'UIT' to 'AAN' and vice versa. Need counter variable
-            #    html.Button(
-            #        children='switch',
-            #        id='bediening_knop_2',
-            #        n_clicks=0
-            #    )
-
-            #]),
 
             html.Div([
 
@@ -67,6 +53,7 @@ layout = html.Div([
                     id='uitrol_bereik_autonoom',
                     min=0,
                     max=160,
+                    value=[min_temp, max_temp],
                     marks={
                         0: {'label': '0cm'},
                         20: {'label': '20cm'},

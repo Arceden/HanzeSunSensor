@@ -18,4 +18,4 @@ import plotly.graph_objs as go
 def update(n):
     x = ar.get_settings()
     y = ar.get_state()
-    return 'FUCKER {} {} {}'.format(random.randint(1, 20), x, y)
+    return 'TESTER {} {} {}'.format(random.randint(1, 20), x, y)
