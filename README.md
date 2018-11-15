@@ -2,7 +2,7 @@
 Voor dit project van de Hanzehogeschool Groningen word er een systeem gemaakt dat automatisch of handmatig een zonnescherm kan bedienen doormiddel van een C en Python.
 
 ## Python
-###Installatie
+### Installatie
 Voor het gebruik van de Python code moeten er wel verschillende Python pakketten worden geinstalleerd.
 ```
 pip install dash
@@ -12,7 +12,7 @@ pip install pandas
 pip install pyserial
 ```
 
-###Gebruik
+### Gebruik
 Om gebruik te maken van het Python systeem moet je in het serialv2 folder het bestand run.py starten. Bij het eerste gebruik zal het systeem vragen voor een communicatie port(USB), dit hoeft maar eenmalig te worden gedaan aangezien de Arduino.py klasse het zal onthouden voor de volgende keren. Het systeem heeft Python 3.x of hoger nodig om te kunnen starten.
 
 ## C
@@ -30,7 +30,7 @@ Voorbeeld:
 [system] > {'type': 'settings', 'manual': 1, 'debug': 1, 'rotation': 0, 'temperature':{'max': 50, 'min': 0}, 'light':{'max': 50, 'min': 0}, 'extension':{'max': 180, 'min': 0}}
 ```
 
-###Commandos
+### Commandos
 Voor de meeste variabelen zijn er meerdere POST commandos. De commando waarbij het eindigd met een 'h' is de maximale waarde van de variabele. En voor de commando waarbij het eindigd met een 'l' is de minimale waarde van de variabele.
 ```
 GET commandos:
