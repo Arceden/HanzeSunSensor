@@ -357,7 +357,7 @@ void zonnescherm (void){
 	
 	int a = get_percentage(rotation, 30);
 	int b = get_percentage(position, 160);
-	if(a<b+5 && a>b-5){
+	if(a<b+8 && a>b-8){
 		if(position==exth){
 			PORTB=1;
 		} else {
