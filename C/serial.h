@@ -53,3 +53,15 @@ unsigned char receive( void )
 	/* Get and return received data from buffer */
 	return UDR0;
 }
+
+/************************************************************************/
+/* Check if there is any data incomming. If so; return 1				*/
+/************************************************************************/
+int message_incomming( void )
+{
+	if((UCSR0A & (1<<RXC0))){
+		return 1;
+	} else {
+		return 0;
+	}
+}

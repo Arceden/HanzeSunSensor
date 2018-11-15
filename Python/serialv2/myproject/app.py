@@ -1,57 +1,40 @@
-from .server import app, server
+from .server import app, server, ar, autonoom
 from . import callbacks_home
 from . import callbacks_data
 from . import callbacks_bediening
+from . import callbacks_instellingen
 from .layout import home
 from .layout import bediening
 from .layout import data
+from .layout import instellingen
 
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, Event
+import plotly.graph_objs as go
+from collections import deque
 
 import random
 import time
 import datetime
-import serial
 import json
+from pprint import pprint
 
 
+# converts the temperature to degrees Celsius
+def conv_temp(reading):
+    voltage = reading * 5.0
+    voltage /= 1024.0
+    temperatureC = (voltage - 0.5) * 100
+    return temperatureC
 
-def portIsUsable(portName):
-    try:
-       ser = serial.Serial(port=portName)
-       return True
-    except:
-       return False
+# converts the light intensity to light value, this code is not correct and not used. It returns the ?Volt?
+def conv_light(reading):
+    light = reading * 4.98
+    light /= 1023
+    return light
 
-
-try:
-    ser = serial.Serial('/dev/tty.usbmodem1411', 19200)
-    ser.write(b'd') # connect
-    z = ser.readline()
-except:
-    print('')
-
-
-def get_temperature_arduino():
-    ser.write(b'd')
-    data = str(ser.readline())
-    d = data[2:-5]
-    json_acceptable_string = d.replace("'", "\"")
-    temp = json.loads(json_acceptable_string)
-    temp = temp['temperature']
-    return temp
-
-def get_lightintensity_arduino():
-    ser.write(b'd')
-    data = str(ser.readline())
-    d = data[2:-5]
-    json_acceptable_string = d.replace("'", "\"")
-    temp = json.loads(json_acceptable_string)
-    temp = temp['light_intensity']
-    return temp
-
+# the html code that is used by app
 app.layout = html.Div([
 
 
@@ -84,10 +67,10 @@ app.layout = html.Div([
                     value='bediening_tab',
                 ),
 
-                dcc.Tab(
-                    label='Instellingen',
-                    value='instellingen_tab',
-                )
+                #dcc.Tab(
+                #    label='Instellingen',
+                #    value='instellingen_tab',
+                #)
 
             ]
             , value='home_tab'
@@ -96,6 +79,9 @@ app.layout = html.Div([
     ]),
 
     html.Div(id='tab_content'),
+
+    html.Div(id='hidden_data', style={'display':'none'}),
+    dcc.Interval(id='hidden_data_interval', interval=1*5000, n_intervals=0),
 
     html.Div(id='hidden_temp', style={'display':'none'}),
     dcc.Interval(id='hidden_temp_interval', interval=1*5000, n_intervals=0),
@@ -110,11 +96,20 @@ app.layout = html.Div([
     dcc.Interval(id='hidden_date_interval', interval=1*5000, n_intervals=0),
 
     html.Div(id='hidden_status', style={'display':'none'}),
-    dcc.Interval(id='hidden_status_interval', interval=1*5000, n_intervals=0)
+    dcc.Interval(id='hidden_status_interval', interval=1*5000, n_intervals=0),
+
+    html.Div(id='hidden_manual', style={'display':'none'})
 
 
 ], style={'width':'100%','background-color':'#e5e8e6','height':'100%','min-height':'1024px'})
 
+
+@app.callback(Output("hidden_data", "children"), [Input('hidden_temp_interval', 'n_intervals')])
+def update_data(n):
+    ar.get_data()
+    return n
+
+# renders the content of the Home, Data and Bediening tab. It is dynamically loaded.
 @app.callback(Output("tab_content", "children"), [Input("tabs", "value")])
 def render_content(tab):
     if tab == "home_tab":
@@ -123,34 +118,33 @@ def render_content(tab):
         return data.layout
     elif tab == "bediening_tab":
         return bediening.layout
-    else:
-        return 'must still be done :D'
+    #else:
+    #    return instellingen.layout
 
-# update temperature
+# updates the temperature every specified interval and returns it.
 @app.callback(
     Output('hidden_temp', 'children'),
     [Input('hidden_temp_interval', 'n_intervals')]
 )
 def update_temp(n):
-    if portIsUsable("/dev/tty.usbmodem1411"):
-        temp = get_temperature_arduino()
-    else:
-        temp = 'N'
+    temp = ar.get_temperature()
+    temp = round(conv_temp(temp), 2)
     return '{}°C.'.format(temp)
 
-# update light
+
+
+# updates the light every specified interval and returns it.
 @app.callback(
     Output('hidden_light', 'children'),
     [Input('hidden_light_interval', 'n_intervals')]
 )
 def update_light(n):
-    if portIsUsable("/dev/tty.usbmodem1411"):
-        light = get_lightintensity_arduino()
-    else:
-        light = "N"
+    light = ar.get_light()
+    #light = conv_light(light)
     return light
 
-# update time
+
+# updates the time every specified interval and returns it.
 @app.callback(
     Output('hidden_time', 'children'),
     [Input('hidden_time_interval', 'n_intervals')]
@@ -159,7 +153,7 @@ def update_time(n):
     current = time.strftime('%H:%M:%S')
     return current
 
-# update date
+# update the data every specified interval and returns it.
 @app.callback(
     Output('hidden_date', 'children'),
     [Input('hidden_date_interval', 'n_intervals')]
@@ -168,13 +162,10 @@ def update_date(n):
     current_date = datetime.datetime.now().strftime('%d/%m/%y')
     return current_date
 
-# update status
+# update the status every specified interval and returns it. (should still improve the method because nothing changes, so it's useless)
 @app.callback(
     Output('hidden_status', 'children'),
     [Input('hidden_status_interval', 'n_intervals')]
 )
 def update_status(n):
-    if portIsUsable("/dev/tty.usbmodem1411"):
-        return "aangesloten"
-    else:
-        return "niet aangesloten"
+    return html.Span(children="aangesloten", style={"color":"green"})

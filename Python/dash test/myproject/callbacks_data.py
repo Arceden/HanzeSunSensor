@@ -8,6 +8,15 @@ import pandas as pd
 import random
 from collections import deque
 
+import serial
+
+def portIsUsable(portName):
+    try:
+       ser = serial.Serial(port=portName)
+       return True
+    except:
+       return False
+
 # show the temperatuur
 @app.callback(
     Output('temperatuur_data', 'children'),
@@ -22,4 +31,12 @@ def show_temp(n):
     [Input('hidden_light', 'children')]
 )
 def show_temp(n):
+    return n
+
+# change status
+@app.callback(
+    Output('status_data', 'children'),
+    [Input('hidden_status', 'children')]
+)
+def connection_check(n):
     return n

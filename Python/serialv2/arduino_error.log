@@ -1,0 +1,1 @@
+JSONDecodeError: {"type":"post_request", "success": 1}{"type": "current_data", "temperature": 142, "light_intensity": 336}
