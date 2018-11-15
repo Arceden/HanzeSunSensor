@@ -59,7 +59,7 @@ layout = html.Div([
             html.Span(id='temperatuur_home', style={'font-size': '24px', 'position':'relative', 'top':'25%'})
 
         ],
-        style={'float':'left', 'width':'24.33%','height':'250px', 'margin':'0.25%', 'background-color':'#FFFFFF', 'border':'0.1vw solid #C8D4E3', 'text-align':'center'}
+        style={'float':'left', 'width':'24.33%', 'box-sizing':'border-box','height':'250px', 'margin':'0.25%', 'background-color':'#FFFFFF', 'border':'0.1vw solid #C8D4E3', 'text-align':'center'}
         ),
 
         html.Div([
